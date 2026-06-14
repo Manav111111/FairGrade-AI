@@ -183,15 +183,6 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Stats bar */}
-          <div className="flex flex-wrap justify-center gap-2 mb-16 animate-fade-in stagger-2">
-            <div className="glass rounded-2xl flex divide-x divide-[#1e1e2e]">
-              <StatPill value="100%" label="Free Stack" />
-              <StatPill value="2" label="AI Models" />
-              <StatPill value="0" label="Answer Keys Needed" />
-              <StatPill value="∞" label="Questions/Exam" />
-            </div>
-          </div>
 
           {/* ── Mode Selection Cards ─────────────────────────────── */}
           <div className="grid md:grid-cols-2 gap-6 mb-20">
@@ -304,8 +295,6 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-6 text-xs text-[#555570]">
             <span>Powered by Groq + Gemini + Supabase</span>
-            <span>•</span>
-            <span>100% Free Stack</span>
           </div>
         </div>
       </footer>

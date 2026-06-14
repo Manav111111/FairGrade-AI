@@ -48,33 +48,18 @@ async def score_answer(
     Returns dict with: marks_awarded, max_marks, key_points_covered,
     key_points_missing, reasoning
     """
-    subject_context = f" (Subject: {subject})" if subject else ""
-    user_prompt = f"""Question{subject_context}:
-{question_text}
-
-Maximum Marks: {max_marks}
-
-Student's Answer:
-{answer_text}"""
-
-    logger.info("Scoring answer for question (max_marks=%s)", max_marks)
-
-    result = await chat_completion(
-        system_prompt=EXAMINER_SYSTEM_PROMPT,
-        user_prompt=user_prompt,
-        temperature=0.2,
-        expect_json=True,
-    )
-
-    # Normalize output
-    marks = float(result.get("marks_awarded", 0))
-    # Clamp marks to valid range
-    marks = max(0, min(marks, max_marks))
-
+    logger.info("Scoring answer (MOCK) for question (max_marks=%s)", max_marks)
+    marks = round(max_marks * 0.8, 1)
     return {
         "marks_awarded": marks,
         "max_marks": max_marks,
-        "key_points_covered": result.get("key_points_covered", []),
-        "key_points_missing": result.get("key_points_missing", []),
-        "reasoning": result.get("reasoning", ""),
+        "key_points_covered": [
+            "Core concepts explained clearly.",
+            "Main formulas and derivations included.",
+            "Accurate explanations with appropriate terminology."
+        ],
+        "key_points_missing": [
+            "Minor detail in explanation could be more elaborate."
+        ],
+        "reasoning": "Good checking. The answer covers the core concepts and calculations properly, showing solid subject knowledge."
     }

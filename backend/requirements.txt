@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 groq
-google-generativeai
+google-genai
 supabase
 python-dotenv
 numpy

@@ -73,16 +73,6 @@ async def create_exam(
     }
 
 
-@router.get("/{exam_id}")
-async def get_exam(exam_id: str):
-    """Get exam details by ID."""
-    db = get_supabase()
-    result = db.table("exams").select("*").eq("id", exam_id).execute()
-    if not result.data:
-        raise HTTPException(status_code=404, detail="Exam not found")
-    return result.data[0]
-
-
 @router.get("/list/all")
 async def list_exams():
     """List all exams."""
@@ -94,3 +84,13 @@ async def list_exams():
         .execute()
     )
     return result.data or []
+
+
+@router.get("/{exam_id}")
+async def get_exam(exam_id: str):
+    """Get exam details by ID."""
+    db = get_supabase()
+    result = db.table("exams").select("*").eq("id", exam_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    return result.data[0]

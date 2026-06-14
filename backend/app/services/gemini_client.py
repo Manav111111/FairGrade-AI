@@ -1,6 +1,6 @@
 """
-Gemini Vision client wrapper — used for OCR on question papers and answer sheets.
-Uses gemini-2.0-flash via Google's free API.
+Gemini Vision client wrapper — uses the new google-genai SDK.
+Used for OCR on question papers and answer sheets (gemini-2.0-flash).
 """
 import json
 import logging
@@ -8,24 +8,25 @@ import base64
 import re
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from app.config import GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
 
-_configured = False
+_client: genai.Client | None = None
 
 
-def _ensure_configured():
-    global _configured
-    if not _configured:
+def _get_client() -> genai.Client:
+    global _client
+    if _client is None:
         if not GEMINI_API_KEY:
             raise RuntimeError("GEMINI_API_KEY must be set in .env")
-        genai.configure(api_key=GEMINI_API_KEY)
-        _configured = True
+        _client = genai.Client(api_key=GEMINI_API_KEY)
+    return _client
 
 
-def _load_file_as_part(file_path: str) -> dict:
+def _load_file_as_part(file_path: str) -> types.Part:
     """Load a local file and convert to a Gemini-compatible inline data part."""
     path = Path(file_path)
     suffix = path.suffix.lower()
@@ -43,7 +44,7 @@ def _load_file_as_part(file_path: str) -> dict:
     with open(file_path, "rb") as f:
         data = f.read()
 
-    return {"inline_data": {"mime_type": mime_type, "data": base64.b64encode(data).decode()}}
+    return types.Part.from_bytes(data=data, mime_type=mime_type)
 
 
 async def vision_extract(
@@ -55,15 +56,14 @@ async def vision_extract(
     Send an image/PDF to Gemini for vision-based extraction.
     Returns parsed JSON dict or raw text.
     """
-    _ensure_configured()
-    model = genai.GenerativeModel("gemini-2.0-flash")
-
+    client = _get_client()
     file_part = _load_file_as_part(file_path)
 
     try:
-        response = model.generate_content(
-            [prompt, file_part],
-            generation_config=genai.types.GenerationConfig(
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=[prompt, file_part],
+            config=types.GenerateContentConfig(
                 temperature=0.1,
                 max_output_tokens=8192,
             ),

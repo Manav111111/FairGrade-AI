@@ -79,6 +79,23 @@ async def upload_student(
     if not student:
         raise HTTPException(status_code=500, detail="Failed to store student")
 
+    # For AUDIT mode: persist per-question teacher marks into question_scores now,
+    # so the evaluation pipeline can read them during delta calculation.
+    if teacher_marks_map and exam["mode"] == "AUDIT":
+        questions = exam.get("questions_json", [])
+        score_rows = []
+        for q in questions:
+            q_no = str(q.get("q_no", ""))
+            if q_no in teacher_marks_map:
+                score_rows.append({
+                    "student_row_id": student["id"],
+                    "q_no": q_no,
+                    "max_marks": float(q.get("max_marks", 0)),
+                    "teacher_marks": teacher_marks_map[q_no],
+                })
+        if score_rows:
+            db.table("question_scores").insert(score_rows).execute()
+
     return {
         "student_row_id": student["id"],
         "student_id": student_id,
