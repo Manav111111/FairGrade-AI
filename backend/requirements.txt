@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+groq
+google-generativeai
+supabase
+python-dotenv
+numpy
+scipy
+pydantic
+python-multipart
+pdf2image
+PyPDF2
+Pillow
+aiofiles
